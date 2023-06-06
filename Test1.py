@@ -6,13 +6,13 @@ from datetime import datetime
 import os
 
 
-ssh_host = '43.207.203.155'
+ssh_host = ''
 ssh_port = 22
 ssh_user = 'ubuntu'
-ssh_pkey = '/Users/mac/Desktop/AnalyticsNinja/aws-terraform-resources-startups/my_key_pair.pem'
+ssh_pkey = '/my_key_pair.pem'
 db_user = 'admin'
 db_password = 'password'
-db_host = 'my-db-instance.cxjkxlbvg4uh.ap-northeast-1.rds.amazonaws.com'
+db_host = ''
 db_name = 'information_schema'
 
 bastion_server = SSHTunnelForwarder(
@@ -51,7 +51,7 @@ df.to_csv(local_dir + file_dir, sep=';', index = False)
 
 # Upload to s3 bucket 
 s3 = boto3.client('s3')
-bucket_name = 'analytics-ninjas-rtw3hf'
+bucket_name = ''
 s3.upload_file(local_dir + file_dir, bucket_name, file_dir.lstrip('/'))
 
 conn.close()
