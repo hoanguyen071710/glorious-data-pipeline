@@ -2,12 +2,12 @@ from sqlalchemy import create_engine, text
 import random
 
 
-db_user = 'admin'
-db_password = 'password'
-db_host = ''
-db_name = 'stock_db'
+db_user = "admin"
+db_password = "password"
+db_host = ""
+db_name = "stock_db"
+db_url = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:3306/{db_name}"
 
-db_url = f'mysql+pymysql://{db_user}:{db_password}@{db_host}:3306/{db_name}'
 engine = create_engine(db_url)
 conn = engine.connect()
 
@@ -28,7 +28,9 @@ def update_stock_prices():
             new_price = float(round(float(current_price) * (1 + fluctuation), 2))
 
         # Update Stock table
-        update_stock_query = f"UPDATE Stock SET price = {new_price} WHERE stock_id = '{stock_id}'"
+        update_stock_query = (
+            f"UPDATE Stock SET price = {new_price} WHERE stock_id = '{stock_id}'"
+        )
         conn.execute(text(update_stock_query))
     conn.commit()
 
