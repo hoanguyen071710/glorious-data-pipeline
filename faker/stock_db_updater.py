@@ -7,7 +7,7 @@ db_password = 'password'
 db_host = ''
 db_name = 'stock_db'
 
-db_url = f'mysql+pymysql://{db_user}:{db_password}@127.0.0.1:3306/{db_name}'
+db_url = f'mysql+pymysql://{db_user}:{db_password}@{db_host}:3306/{db_name}'
 engine = create_engine(db_url)
 conn = engine.connect()
 
