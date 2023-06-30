@@ -1,40 +1,36 @@
-create database stock_db;
+CREATE DATABASE stock_db;
 
-create table Stock
-(
-    stock_id varchar(5)     not null
-        primary key,
-    company  varchar(100)   not null,
-    category varchar(100)   not null,
-    price    decimal(10, 2) not null,
-    constraint company
-        unique (company)
-);
+CREATE TABLE stock
+  (
+     stock_id VARCHAR(5) NOT NULL PRIMARY KEY,
+     company  VARCHAR(100) NOT NULL,
+     category VARCHAR(100) NOT NULL,
+     price    DECIMAL(10, 2) NOT NULL,
+     CONSTRAINT company UNIQUE (company)
+  );
 
-create table User
-(
-    user_id int auto_increment
-        primary key,
-    name    varchar(100) not null,
-    email   varchar(100) not null
-);
+CREATE TABLE user
+  (
+     user_id    INT auto_increment PRIMARY KEY,
+     name       VARCHAR(100) NOT NULL,
+     email      VARCHAR(100) NOT NULL,
+     updated_at TIMESTAMP,
+     status     VARCHAR(1) DEFAULT NULL
+  );
 
-create table Transaction
-(
-    transaction_id   int auto_increment
-        primary key,
-    user_id          int                                 null,
-    stock_id         varchar(5)                          not null,
-    quantity         int                                 not null,
-    transaction_date timestamp default CURRENT_TIMESTAMP null,
-    constraint Transaction_Stock_stock_id_fk
-        foreign key (stock_id) references Stock (stock_id),
-    constraint Transaction_User_user_id_fk
-        foreign key (user_id) references User (user_id)
-);
+CREATE TABLE transaction
+  (
+     transaction_id   INT auto_increment PRIMARY KEY,
+     user_id          INT NULL,
+     stock_id         VARCHAR(5) NOT NULL,
+     quantity         INT NOT NULL,
+     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NULL,
+     CONSTRAINT transaction_stock_stock_id_fk FOREIGN KEY (stock_id) REFERENCES
+     stock (stock_id),
+     CONSTRAINT transaction_user_user_id_fk FOREIGN KEY (user_id) REFERENCES
+     user (user_id)
+  );
 
-create index stock_id
-    on Transaction (stock_id);
+CREATE INDEX stock_id ON transaction (stock_id);
 
-create index user_id
-    on Transaction (user_id);
+CREATE INDEX user_id ON transaction (user_id);

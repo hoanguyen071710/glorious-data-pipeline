@@ -3,14 +3,13 @@ import random
 import datetime
 import os
 
+
 db_url = os.environ['DB_URL']
 
-engine = create_engine(db_url)
-conn = engine.connect()
-
-
 def updater(event, context):
-    insert_into_db(5)
+    engine = create_engine(db_url)
+    with engine.connect() as conn:
+        insert_into_db(conn, 5)
 
 
 # Randomize transaction count ratio to total users
@@ -42,4 +41,3 @@ def insert_into_db(transaction_count):
     '''
     conn.execute(text(insert_query))
     conn.commit()
-    conn.close()

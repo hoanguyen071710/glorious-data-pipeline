@@ -1,15 +1,13 @@
 from sqlalchemy import create_engine, text
 import random
+import os
 
-db_user = "admin"
-db_password = "password"
-db_host = ""
-db_name = "stock_db"
-db_url = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:3306/{db_name}"
+
+db_url = os.environ['DB_URL']
 engine = create_engine(db_url)
 
 
-def update_stock_prices():
+def update_stock_prices(event, context):
     with engine.connect() as conn:
         select_stock_query = "SELECT stock_id, price FROM Stock"
         stocks = conn.execute(text(select_stock_query))
@@ -36,7 +34,3 @@ def generate_new_price(current_price):
         new_price = float(round(float(current_price) * (1 + fluctuation), 2))
 
     return new_price
-
-
-if __name__ == "__main__":
-    update_stock_prices()
