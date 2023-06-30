@@ -3,8 +3,8 @@ import random
 import datetime
 import os
 
-
 db_url = os.environ['DB_URL']
+
 
 def updater(event, context):
     engine = create_engine(db_url)
@@ -13,14 +13,13 @@ def updater(event, context):
 
 
 # Randomize transaction count ratio to total users
-def get_info(transaction_count):
+def get_info(conn, transaction_count):
     result_user = conn.execute(text(f'SELECT * FROM stock_db.User')).fetchall()
     stock_info = conn.execute(text(f"SELECT * FROM stock_db.Stock")).fetchall()
     return result_user, stock_info, transaction_count
 
 
-def user_stock_matching(transaction_count):
-    result_user, stock_info, transaction_count = get_info(transaction_count)
+def user_stock_matching(result_user, stock_info, transaction_count):
     transaction_list = []
     for i in range(transaction_count):
         random_user_loc = random.randint(0, len(result_user) - 1)
@@ -33,8 +32,9 @@ def user_stock_matching(transaction_count):
     return transaction_list
 
 
-def insert_into_db(transaction_count):
-    transaction_query = ','.join(user_stock_matching(transaction_count))
+def insert_into_db(conn, transaction_count):
+    result_user, stock_info, transaction_count = get_info(conn, transaction_count)
+    transaction_query = ','.join(user_stock_matching(result_user, stock_info, transaction_count))
     insert_query = f'''
     INSERT INTO stock_db.Transaction (user_id, stock_id, quantity, transaction_date)
     VALUES {transaction_query}
