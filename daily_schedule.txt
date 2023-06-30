@@ -1,0 +1,3 @@
+0 6 * * * python3 ~/glorious-data-pipeline/faker/stock_db_updater.py
+0 18 * * * python3 ~/glorious-data-pipeline/faker/user_updater.py
+0 8-17 * * * python3 ~/glorious-data-pipeline/faker/transaction_updater.py

@@ -47,4 +47,4 @@ def updater(transaction_count):
 
 if __name__ == "__main__":
     with engine.connect() as conn:
-        updater(20)
+        updater(5)
