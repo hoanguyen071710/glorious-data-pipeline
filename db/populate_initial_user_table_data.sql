@@ -1,4 +1,3 @@
-
 INSERT INTO User (name, email) 
 VALUES 
 	('Brandon Cardenas MD', 'BrandonCardenasMD@example.net'),

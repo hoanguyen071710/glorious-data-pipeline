@@ -1,14 +1,10 @@
 from sqlalchemy import create_engine, text
 from faker import Faker
 import random
-
-db_user = "admin"
-db_password = "password"
-db_host = "my-db-instance.cxjkxlbvg4uh.ap-northeast-1.rds.amazonaws.com"
-db_name = "stock_db"
+import os
 
 
-db_url = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:3306/{db_name}"
+db_url = os.environ['DB_URL']
 
 engine = create_engine(db_url)
 
@@ -31,6 +27,7 @@ def update_current_user():
         new_email = fake.email()
         update_query = f"UPDATE stock_db.User SET email = '{new_email}' WHERE user_id = {user_id}"
         conn.execute(text(update_query))
+        conn.commit()
 
 # Create new users
 def create_new_user(new_user_count):
@@ -48,13 +45,9 @@ def create_new_user(new_user_count):
     VALUES {insert_val}
     '''
     conn.execute(text(insert_query))
-
-def updater(new_user_count):
-    update_current_user()
-    create_new_user(new_user_count)
     conn.commit()
-    conn.close()
 
-if __name__ == "__main__":
+def updater(event, context):
     with engine.connect() as conn:
-        updater(10)
+        update_current_user()
+        create_new_user(10)
