@@ -3,7 +3,7 @@ import random
 import os
 
 
-db_url = os.environ['DB_URL']
+db_url = os.environ["DB_URL"]
 engine = create_engine(db_url)
 
 
