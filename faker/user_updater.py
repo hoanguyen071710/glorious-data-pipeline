@@ -9,8 +9,7 @@ db_url = os.environ["DB_URL"]
 engine = create_engine(db_url)
 
 
-# Get the number of users that update email
-def update_rate():
+def update_rate(conn):
     result = conn.execute(text("SELECT * FROM stock_db.User")).fetchall()
     update_rate = random.uniform(0, 0.02)
     update_count = round(update_rate * len(result))
@@ -21,10 +20,9 @@ def update_rate():
     return update_user
 
 
-# Update these users info
-def update_current_user():
+def update_current_user(conn):
     fake = Faker()
-    update_user = update_rate()
+    update_user = update_rate(conn)
     for usr in update_user:
         user_id = usr[0]
         new_email = fake.email()
@@ -32,11 +30,9 @@ def update_current_user():
             f"UPDATE stock_db.User SET email = '{new_email}' WHERE user_id = {user_id}"
         )
         conn.execute(text(update_query))
-        conn.commit()
 
 
-# Create new users
-def create_new_user(new_user_count):
+def create_new_user(new_user_count, conn):
     fake = Faker()
     new_user_count = new_user_count
     new_user_list = []
@@ -56,5 +52,5 @@ def create_new_user(new_user_count):
 
 def updater(event, context):
     with engine.connect() as conn:
-        update_current_user()
-        create_new_user(10)
+        update_current_user(conn)
+        create_new_user(10, conn)
