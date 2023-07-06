@@ -10,3 +10,4 @@ six==1.16.0
 SQLAlchemy==2.0.17
 typing_extensions==4.6.3
 urllib3==1.26.16
+pandas==2.0.3
