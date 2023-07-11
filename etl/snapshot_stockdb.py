@@ -9,11 +9,11 @@ db_url = os.environ["DB_URL"]
 engine = create_engine(db_url)
 conn = engine.connect()
 
-snapshot = "SELECT * FROM stock"
+snapshot = f"SELECT * FROM stock_db.Stock"
 snapshot_data = conn.execute(text(snapshot)).fetchall()
 
 # Get column name
-col = conn.execute(text("SHOW COLUMNS FROM stock")).fetchall()
+col = conn.execute(text("SHOW COLUMNS FROM stock_db.Stock")).fetchall()
 col_list = [x[0] for x in col]
 
 # Convert to dataframe
