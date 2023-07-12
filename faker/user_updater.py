@@ -45,7 +45,9 @@ def create_new_user(new_user_count, conn):
     for new_usr in range(new_user_count):
         user_name = fake.name()
         user_email = fake.email()
-        updated_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        updated_at = (datetime.datetime.now() + datetime.timedelta(hours=7)).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
         status = "I"
         new_user_list.append(str((user_name, user_email, updated_at, status)))
     # Create query string to insert new users
@@ -62,3 +64,7 @@ def updater(event, context):
     with engine.connect() as conn:
         update_current_user(conn)
         create_new_user(10, conn)
+
+
+if __name__ == "__main__":
+    updater(1, 1)

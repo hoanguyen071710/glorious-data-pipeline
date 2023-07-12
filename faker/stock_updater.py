@@ -34,3 +34,7 @@ def generate_new_price(current_price):
         new_price = float(round(float(current_price) * (1 + fluctuation), 2))
 
     return new_price
+
+
+if __name__ == "__main__":
+    update_stock_prices(1, 1)
