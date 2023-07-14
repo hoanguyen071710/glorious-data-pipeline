@@ -28,7 +28,7 @@ n_1_date = str(current_date - timedelta(days=1)).replace('-','')
 # Save CSV to memory but not solid state disk
 csv_buffer = StringIO()
 snapshot_df.to_csv(csv_buffer, index = False)
-file_upload_dir =  '/etl_' + n_1_date + '.csv'
+file_upload_dir =  f'stock_db/stock/partition={n_1_date}/stock.csv'
 
 # Upload to s3 bucket
 s3 = boto3.client('s3',aws_access_key_id=os.environ["ACCESS_KEY"], aws_secret_access_key=os.environ["SECRET_KEY"])
