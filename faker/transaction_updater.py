@@ -27,7 +27,9 @@ def user_stock_matching(result_user, stock_info, transaction_count):
         random_user = result_user[random_user_loc][0]
         random_stock = stock_info[random_stock_loc][0]
         random_quantity = random.randint(1, 10)
-        random_transaction_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        random_transaction_date = (
+            datetime.datetime.now() + datetime.timedelta(hours=7)
+        ).strftime("%Y-%m-%d %H:%M:%S")
         transaction_list.append(
             str((random_user, random_stock, random_quantity, random_transaction_date))
         )
@@ -45,3 +47,7 @@ def insert_into_db(conn, transaction_count):
     """
     conn.execute(text(insert_query))
     conn.commit()
+
+
+if __name__ == "__main__":
+    updater(1, 1)
