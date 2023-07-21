@@ -9,32 +9,28 @@ db_url = os.environ["DB_URL"]
 engine = create_engine(db_url)
 conn = engine.connect()
 
-snapshot = f"SELECT * FROM stock_db.Stock"
-snapshot_data = conn.execute(text(snapshot)).fetchall()
+def extract_data():
+    snapshot = f"SELECT * FROM stock_db.Stock"
+    snapshot_data = conn.execute(text(snapshot)).fetchall()
+    col = conn.execute(text("SHOW COLUMNS FROM stock_db.Stock")).fetchall()
+    col_list = [x[0] for x in col]
+    snapshot_df = pd.DataFrame(snapshot_data, columns=col_list)
+    return snapshot_df
 
-# Get column name
-col = conn.execute(text("SHOW COLUMNS FROM stock_db.Stock")).fetchall()
-col_list = [x[0] for x in col]
+def date_substraction(day):
+    current_date = datetime.now().date()
+    n_1_date = str(current_date - timedelta(days=day)).replace('-','')
+    return n_1_date
 
-# Convert to dataframe
-snapshot_df = pd.DataFrame(snapshot_data, columns=col_list)
+def upload_to_s3(df, date):
+    csv_buffer = StringIO()
+    df.to_csv(csv_buffer, index = False)
+    file_upload_dir =  f'stock_db/stock/partition={date}/stock.csv'
+    s3 = boto3.client('s3',aws_access_key_id=os.environ["ACCESS_KEY"], aws_secret_access_key=os.environ["SECRET_KEY"])
+    bucket_name = 'analytics-ninjas'
+    s3.put_object(Body=csv_buffer.getvalue(), Bucket=bucket_name, Key=file_upload_dir.lstrip('/'))
+    csv_buffer.close()
+    conn.close()
 
-# Get the current date
-current_date = datetime.now().date()
-
-# Calculate the n-1 day's date
-n_1_date = str(current_date - timedelta(days=1)).replace('-','')
-
-# Save CSV to memory but not solid state disk
-csv_buffer = StringIO()
-snapshot_df.to_csv(csv_buffer, index = False)
-file_upload_dir =  f'stock_db/stock/partition={n_1_date}/stock.csv'
-
-# Upload to s3 bucket
-s3 = boto3.client('s3',aws_access_key_id=os.environ["ACCESS_KEY"], aws_secret_access_key=os.environ["SECRET_KEY"])
-bucket_name = 'analytics-ninjas'
-s3.put_object(Body=csv_buffer.getvalue(), Bucket=bucket_name, Key=file_upload_dir.lstrip('/'))
-
-# Closing allocate memory, and database connection
-csv_buffer.close()
-conn.close()
+if __name__ == "__main__":
+    upload_to_s3(extract_data(), date_substraction(1))
