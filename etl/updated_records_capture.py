@@ -41,11 +41,41 @@ csv_buffer2.close()
 updated_record = snap1_df.merge(snap2_df, on=['stock_id', 'company', 'category', 'price'], how='left', indicator=True)
 updated_record = updated_record[updated_record['_merge'] == 'left_only']
 updated_record = updated_record.loc[:, ['stock_id', 'company', 'category', 'price']]
+updated_record['start_date'] = str(datetime.now()) + ' 08:00:00'
+updated_record['end_date'] = "9999-01-01 00:00:00"
+updated_record['is_current'] = 'T'
+
+# Convert DataFrame to a list of tuples
+list_of_tuples = updated_record.to_records(index=False)
 
 # Connect Yugabyte DB
 db_url = os.environ["YDB_URL"]
 engine = create_engine(db_url)
 conn = engine.connect()
 
-# Insert updated record
-updated_record.to_sql('stock_dim', conn, if_exists='append', index=False)
+# Prepare the SQL query for insertion
+sql_query = ''' INSERT INTO stock_dim (stock_id, company, category, price, start_date, end_date, is_current) 
+                VALUES {','.join(map(str, values))}
+                ON CONFLICT (stock_id, end_date) DO 
+                UPDATE 
+                SET 
+                    end_date = EXCLUDED.start_date - interval '1 second',
+                    is_current = F 
+                WHERE 
+                    stock_dim.SK_stock_id = (
+                SELECT 
+                    MAX(SK_stock_id) 
+                FROM 
+                    stock_dim 
+                WHERE 
+                    stock_id = EXCLUDED.stock_id
+    );'''
+
+# Execute the query for each tuple in the list
+conn.execute(text(sql_query))
+
+# Commit the changes to the database
+conn.commit()
+
+# Close the cursor and connection
+conn.close()
