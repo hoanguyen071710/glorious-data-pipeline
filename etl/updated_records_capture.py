@@ -46,7 +46,7 @@ updated_record['end_date'] = "9999-01-01 00:00:00"
 updated_record['is_current'] = 'T'
 
 # Convert DataFrame to a list of tuples
-list_of_tuples = updated_record.to_records(index=False)
+values = updated_record.to_records(index=False)
 
 # Connect Yugabyte DB
 db_url = os.environ["YDB_URL"]
@@ -54,28 +54,35 @@ engine = create_engine(db_url)
 conn = engine.connect()
 
 # Prepare the SQL query for insertion
-sql_query = ''' INSERT INTO stock_dim (stock_id, company, category, price, start_date, end_date, is_current) 
+sql_query = f'''INSERT INTO stock_dim (stock_id, company, category, price, start_date, end_date, is_current)
                 VALUES {','.join(map(str, values))}
-                ON CONFLICT (stock_id, end_date) DO 
-                UPDATE 
-                SET 
+                ON CONFLICT (stock_id, end_date) DO
+                UPDATE
+                SET
                     end_date = EXCLUDED.start_date - interval '1 second',
-                    is_current = F 
-                WHERE 
-                    stock_dim.SK_stock_id = (
-                SELECT 
-                    MAX(SK_stock_id) 
-                FROM 
-                    stock_dim 
-                WHERE 
-                    stock_id = EXCLUDED.stock_id
-    );'''
+                    is_current = 'F'
+                WHERE
+                    stock_dim.sk_stock_id = (
+                SELECT
+                    MAX(sk_stock_id)
+                FROM
+                    stock_dim
+                WHERE stock_id = EXCLUDED.stock_id);'''
 
-# Execute the query for each tuple in the list
-conn.execute(text(sql_query))
+sql_query2 = f'''INSERT INTO stock_dim (stock_id, company, category, price, start_date, end_date, is_current)
+                VALUES {','.join(map(str, values))};'''
+                
+# Execute the query for each tuple in the lis
+if conn.execute(text("SELECT * FROM stock_dim")).fetchall() == []:
+    conn.execute(text(sql_query2))
+else:
+    conn.execute(text(sql_query))
+    conn.execute(text(sql_query2))
 
-# Commit the changes to the database
+#Commit the changes to the database
 conn.commit()
 
 # Close the cursor and connection
 conn.close()
+
+
