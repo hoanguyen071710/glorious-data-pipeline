@@ -8,7 +8,7 @@ import io
 
 
 def date_substraction(day1, day2):
-    current_date = datetime.now().date()
+    current_date = datetime.now().date() + datetime.timedelta(hours=7)
     n_1_date = str(current_date - timedelta(days=day1)).replace("-", "")
     n_2_date = str(current_date - timedelta(days=day2)).replace("-", "")
     return n_1_date, n_2_date
@@ -21,9 +21,7 @@ def down_file(n_1_date, n_2_date):
     file_dir_1 = f"stock_db/stock/partition={n_1_date}/stock.csv"
     file_dir_2 = f"stock_db/stock/partition={n_2_date}/stock.csv"
     s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.environ["ACCESS_KEY"],
-        aws_secret_access_key=os.environ["SECRET_KEY"],
+        "s3"
     )
     s3.download_fileobj(Bucket=bucket_name, Key=file_dir_1, Fileobj=csv_buffer1)
     s3.download_fileobj(Bucket=bucket_name, Key=file_dir_2, Fileobj=csv_buffer2)
@@ -46,9 +44,9 @@ def find_updated_records(df1, df2):
     )
     updated_record = updated_record[updated_record["_merge"] == "left_only"]
     updated_record = updated_record.loc[:, ["stock_id", "company", "category", "price"]]
-    updated_record["start_date"] = str(datetime.now().date()) + " 08:00:00"
-    updated_record["end_date"] = "9999-01-01 00:00:00"
-    updated_record["is_current"] = "T"
+    updated_record["start_date"] = str(datetime.now().date() + datetime.timedelta(hours=7)) + " 08:00:00"
+    updated_record["end_date"] = "9999-12-31 23:59:59"
+    updated_record["is_current"] = True
     return updated_record
 
 
@@ -78,7 +76,7 @@ def incremental_load(values):
                 UPDATE
                 SET
                     end_date = EXCLUDED.start_date - interval '1 second',
-                    is_current = 'F'
+                    is_current = False
                 WHERE
                     stock_dim.sk_stock_id = (
                 SELECT
