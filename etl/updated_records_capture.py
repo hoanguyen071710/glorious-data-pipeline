@@ -29,6 +29,7 @@ def down_file_2_days(n_1_date, n_2_date):
     csv_buffer2.close()
     return csv_1, csv_2
 
+
 def down_file_1_day(n_1_date):
     bucket_name = "analytics-ninjas"
     csv_buffer1 = BytesIO()
@@ -39,10 +40,12 @@ def down_file_1_day(n_1_date):
     csv_buffer1.close()
     return csv_1
 
+
 def convert_to_df_2_days(csv1, csv2):
     snap1_df = pd.read_csv(io.StringIO(csv1))
     snap2_df = pd.read_csv(io.StringIO(csv2))
     return snap1_df, snap2_df
+
 
 def convert_to_df_1_day(csv1):
     snap1_df = pd.read_csv(io.StringIO(csv1))

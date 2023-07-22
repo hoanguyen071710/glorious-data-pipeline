@@ -20,7 +20,7 @@ def extract_data():
 
 
 def date_substraction(day):
-    current_date = (datetime.now() + timedelta(hours=7)).date() 
+    current_date = (datetime.now() + timedelta(hours=7)).date()
     n_1_date = str(current_date - timedelta(days=day)).replace("-", "")
     return n_1_date
 
