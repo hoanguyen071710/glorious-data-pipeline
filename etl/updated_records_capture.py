@@ -20,9 +20,7 @@ def down_file(n_1_date, n_2_date):
     csv_buffer2 = BytesIO()
     file_dir_1 = f"stock_db/stock/partition={n_1_date}/stock.csv"
     file_dir_2 = f"stock_db/stock/partition={n_2_date}/stock.csv"
-    s3 = boto3.client(
-        "s3"
-    )
+    s3 = boto3.client("s3")
     s3.download_fileobj(Bucket=bucket_name, Key=file_dir_1, Fileobj=csv_buffer1)
     s3.download_fileobj(Bucket=bucket_name, Key=file_dir_2, Fileobj=csv_buffer2)
     csv_1 = csv_buffer1.getvalue().decode("utf-8")
@@ -44,7 +42,9 @@ def find_updated_records(df1, df2):
     )
     updated_record = updated_record[updated_record["_merge"] == "left_only"]
     updated_record = updated_record.loc[:, ["stock_id", "company", "category", "price"]]
-    updated_record["start_date"] = str(datetime.now().date() + datetime.timedelta(hours=7)) + " 08:00:00"
+    updated_record["start_date"] = (
+        str(datetime.now().date() + datetime.timedelta(hours=7)) + " 08:00:00"
+    )
     updated_record["end_date"] = "9999-12-31 23:59:59"
     updated_record["is_current"] = True
     return updated_record

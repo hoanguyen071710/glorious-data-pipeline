@@ -29,9 +29,7 @@ def upload_to_s3(df, date):
     csv_buffer = StringIO()
     df.to_csv(csv_buffer, index=False)
     file_upload_dir = f"stock_db/stock/partition={date}/stock.csv"
-    s3 = boto3.client(
-        "s3"
-    )
+    s3 = boto3.client("s3")
     bucket_name = "analytics-ninjas"
     s3.put_object(
         Body=csv_buffer.getvalue(), Bucket=bucket_name, Key=file_upload_dir.lstrip("/")
