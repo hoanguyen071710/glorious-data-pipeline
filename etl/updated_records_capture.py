@@ -8,13 +8,13 @@ import io
 
 
 def date_substraction(day1, day2):
-    current_date = datetime.now().date() + datetime.timedelta(hours=7)
+    current_date = (datetime.now() + timedelta(hours=7)).date()
     n_1_date = str(current_date - timedelta(days=day1)).replace("-", "")
     n_2_date = str(current_date - timedelta(days=day2)).replace("-", "")
     return n_1_date, n_2_date
 
 
-def down_file(n_1_date, n_2_date):
+def down_file_2_days(n_1_date, n_2_date):
     bucket_name = "analytics-ninjas"
     csv_buffer1 = BytesIO()
     csv_buffer2 = BytesIO()
@@ -29,11 +29,29 @@ def down_file(n_1_date, n_2_date):
     csv_buffer2.close()
     return csv_1, csv_2
 
+def down_file_1_day(n_1_date):
+    bucket_name = "analytics-ninjas"
+    csv_buffer1 = BytesIO()
+    file_dir_1 = f"stock_db/stock/partition={n_1_date}/stock.csv"
+    s3 = boto3.client("s3")
+    s3.download_fileobj(Bucket=bucket_name, Key=file_dir_1, Fileobj=csv_buffer1)
+    csv_1 = csv_buffer1.getvalue().decode("utf-8")
+    csv_buffer1.close()
+    return csv_1
 
-def convert_to_df(csv1, csv2):
+def convert_to_df_2_days(csv1, csv2):
     snap1_df = pd.read_csv(io.StringIO(csv1))
     snap2_df = pd.read_csv(io.StringIO(csv2))
     return snap1_df, snap2_df
+
+def convert_to_df_1_day(csv1):
+    snap1_df = pd.read_csv(io.StringIO(csv1))
+    snap1_df["start_date"] = (
+        str((datetime.now() + timedelta(hours=7)).date()) + " 08:00:00"
+    )
+    snap1_df["end_date"] = "9999-12-31 23:59:59"
+    snap1_df["is_current"] = True
+    return snap1_df
 
 
 def find_updated_records(df1, df2):
@@ -43,7 +61,7 @@ def find_updated_records(df1, df2):
     updated_record = updated_record[updated_record["_merge"] == "left_only"]
     updated_record = updated_record.loc[:, ["stock_id", "company", "category", "price"]]
     updated_record["start_date"] = (
-        str(datetime.now().date() + datetime.timedelta(hours=7)) + " 08:00:00"
+        str((datetime.now() + timedelta(hours=7)).date()) + " 08:00:00"
     )
     updated_record["end_date"] = "9999-12-31 23:59:59"
     updated_record["is_current"] = True
@@ -95,11 +113,11 @@ def incremental_load(values):
 if __name__ == "__main__":
     if conn.execute(text("SELECT * FROM stock_dim")).fetchall() == []:
         n_1_date, n_2_date = date_substraction(1, 2)
-        csv_1, csv_2 = down_file(n_1_date, n_2_date)
-        snap1_df, snap2_df = convert_to_df(csv_1, csv_2)
-        full_load(convert_to_tuples(find_updated_records(snap1_df, snap2_df)))
+        csv_1 = down_file_1_day(n_1_date)
+        snap1_df = convert_to_df_1_day(csv_1)
+        full_load(convert_to_tuples(snap1_df))
     else:
         n_1_date, n_2_date = date_substraction(1, 2)
-        csv_1, csv_2 = down_file(n_1_date, n_2_date)
-        snap1_df, snap2_df = convert_to_df(csv_1, csv_2)
+        csv_1, csv_2 = down_file_2_days(n_1_date, n_2_date)
+        snap1_df, snap2_df = convert_to_df_2_days(csv_1, csv_2)
         incremental_load(convert_to_tuples(find_updated_records(snap1_df, snap2_df)))
