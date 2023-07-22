@@ -7,7 +7,7 @@ CREATE TABLE stock_dim
     price       DECIMAL(10, 2) NOT NULL,
     start_date  TIMESTAMP NOT NULL,
     end_date    TIMESTAMP NOT NULL,
-    is_current  CHAR(1) NOT NULL
+    is_current  BOOLEAN NOT NULL
 );
 
 CREATE TABLE user_dim
