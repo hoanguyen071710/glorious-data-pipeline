@@ -20,7 +20,7 @@ def extract_data():
 
 
 def date_substraction(day):
-    current_date = datetime.now().date()
+    current_date = datetime.now().date() + datetime.timedelta(hours=7)
     n_1_date = str(current_date - timedelta(days=day)).replace("-", "")
     return n_1_date
 
@@ -30,9 +30,7 @@ def upload_to_s3(df, date):
     df.to_csv(csv_buffer, index=False)
     file_upload_dir = f"stock_db/stock/partition={date}/stock.csv"
     s3 = boto3.client(
-        "s3",
-        aws_access_key_id=os.environ["ACCESS_KEY"],
-        aws_secret_access_key=os.environ["SECRET_KEY"],
+        "s3"
     )
     bucket_name = "analytics-ninjas"
     s3.put_object(
