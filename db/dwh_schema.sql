@@ -12,13 +12,13 @@ CREATE TABLE stock_dim
 
 CREATE TABLE user_dim
 (
-    SK_user_id SERIAL PRIMARY KEY NOT NULL,
+    SK_user_id SERIAL PRIMARY KEY,
     user_id    INT NOT NULL,
     name       VARCHAR(100) NOT NULL,
     email      VARCHAR(100) NOT NULL,
     start_date TIMESTAMP NOT NULL,
     end_date   TIMESTAMP NOT NULL,
-    is_current CHAR(1) NOT NULL
+    is_current BOOLEAN NOT NULL
 );
 
 CREATE TABLE transaction_fact
