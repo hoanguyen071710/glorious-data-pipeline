@@ -49,9 +49,7 @@ def convert_to_df_2_days(csv1, csv2):
 
 def convert_to_df_1_day(csv1):
     snap1_df = pd.read_csv(io.StringIO(csv1))
-    snap1_df["start_date"] = (
-        str(datetime.now() + timedelta(hours=7))
-    )
+    snap1_df["start_date"] = str(datetime.now() + timedelta(hours=7))
     snap1_df["end_date"] = "9999-12-31 23:59:59"
     snap1_df["is_current"] = True
     return snap1_df
@@ -63,9 +61,7 @@ def find_updated_records(df1, df2):
     )
     updated_record = updated_record[updated_record["_merge"] == "left_only"]
     updated_record = updated_record.loc[:, ["stock_id", "company", "category", "price"]]
-    updated_record["start_date"] = (
-        str(datetime.now() + timedelta(hours=7))
-    )
+    updated_record["start_date"] = str(datetime.now() + timedelta(hours=7))
     updated_record["end_date"] = "9999-12-31 23:59:59"
     updated_record["is_current"] = True
     return updated_record
