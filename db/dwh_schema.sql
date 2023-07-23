@@ -1,10 +1,13 @@
 CREATE TABLE stock_dim
 (
-	SK_stock_id SERIAL PRIMARY KEY,
-	stock_id    VARCHAR(5) NOT NULL,
-	company     VARCHAR(100) NOT NULL,
-	category    VARCHAR(100) NOT NULL,
-	price       DECIMAL(10, 2) NOT NULL
+    SK_stock_id SERIAL PRIMARY KEY NOT NULL,
+    stock_id    VARCHAR(5) NOT NULL,
+    company     VARCHAR(100) NOT NULL,
+    category    VARCHAR(100) NOT NULL,
+    price       DECIMAL(10, 2) NOT NULL,
+    start_date  TIMESTAMP NOT NULL,
+    end_date    TIMESTAMP NOT NULL,
+    is_current  BOOLEAN NOT NULL
 );
 
 CREATE TABLE user_dim
