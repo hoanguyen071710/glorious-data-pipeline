@@ -12,7 +12,7 @@ engine = create_engine(db_url)
 
 def update_rate(conn):
     result = conn.execute(text("SELECT * FROM stock_db.User")).fetchall()
-    update_rate = random.uniform(0, 0.02)
+    update_rate = random.uniform(0, 0.15)
     update_count = round(update_rate * len(result))
     # Get update user data
     update_user = conn.execute(
