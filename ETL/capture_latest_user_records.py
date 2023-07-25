@@ -31,13 +31,21 @@ def get_latest_snapshot_datalake(days=1):
 
 
 def get_path_snapshot(days):
-    today = str(datetime.datetime.now() - datetime.timedelta(days=days))[0:10].replace(
-        "-", ""
-    )
+    today = str(
+        datetime.datetime.now()
+        + datetime.timedelta(hours=7)
+        - datetime.timedelta(days=days)
+    )[0:10].replace("-", "")
     return f"/stock_db/user/partition={today}/user.csv"
 
 
 def get_records(df, records_type):
+    latest_date = latest_date = (
+        datetime.datetime.now()
+        + datetime.timedelta(hours=7)
+        - datetime.timedelta(days=1)
+    ).strftime("%Y-%m-%d")
+    df = df.loc[df["updated_at"].str.split(" ").str[0] == latest_date, :]
     if records_type != "All":
         df = df.loc[df["status"] == records_type]
     df.rename(columns={"updated_at": "start_date"})
