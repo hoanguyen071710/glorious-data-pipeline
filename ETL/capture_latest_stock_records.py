@@ -61,9 +61,12 @@ def find_updated_records(df1, df2):
     )
     updated_record = updated_record[updated_record["_merge"] == "left_only"]
     updated_record = updated_record.loc[:, ["stock_id", "company", "category", "price"]]
-    updated_record["start_date"] = str(datetime.now() + timedelta(hours=7))
-    updated_record["end_date"] = "9999-12-31 23:59:59"
-    updated_record["is_current"] = True
+    if updated_record.empty:
+        updated_record
+    else:
+        updated_record["start_date"] = str(datetime.now() + timedelta(hours=7))
+        updated_record["end_date"] = "9999-12-31 23:59:59"
+        updated_record["is_current"] = True
     return updated_record
 
 
@@ -114,9 +117,16 @@ if __name__ == "__main__":
         n_1_date, n_2_date = date_substraction(1, 2)
         csv_1 = down_file_1_day(n_1_date)
         snap1_df = convert_to_df_1_day(csv_1)
-        full_load(convert_to_tuples(snap1_df))
+        if snap1_df.empty:
+            pass
+        else:
+            full_load(convert_to_tuples(snap1_df))
     else:
         n_1_date, n_2_date = date_substraction(1, 2)
         csv_1, csv_2 = down_file_2_days(n_1_date, n_2_date)
         snap1_df, snap2_df = convert_to_df_2_days(csv_1, csv_2)
-        incremental_load(convert_to_tuples(find_updated_records(snap1_df, snap2_df)))
+        updated_record = find_updated_records(snap1_df, snap2_df)
+        if updated_record.empty:
+            pass
+        else:
+            incremental_load(convert_to_tuples(updated_record))
