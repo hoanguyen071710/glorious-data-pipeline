@@ -39,7 +39,7 @@ def get_path_snapshot(days):
     return f"/stock_db/user/partition={today}/user.csv"
 
 
-def get_records(df, records_type):
+def get_records_incremental_load(df, records_type):
     latest_date = latest_date = (
         datetime.datetime.now()
         + datetime.timedelta(hours=7)
@@ -48,19 +48,31 @@ def get_records(df, records_type):
     df = df.loc[df["updated_at"].str.split(" ").str[0] == latest_date, :]
     if records_type != "All":
         df = df.loc[df["status"] == records_type]
-    df.rename(columns={"updated_at": "start_date"})
-    df = df.drop(columns=["status"])
-    df["end_date"] = "9999-12-31 23:59:59"
-    df["is_current"] = True
-    vectorized_element_to_string = np.vectorize(str)
-    records = ",".join(
-        vectorized_element_to_string(pd.Series(df.to_records(index=False).tolist()))
-    )
+    df, records = records_to_tuple(df)
     return df, records
 
 
-def update_end_date_outdated_records(conn, df):
-    update_values = get_records(df, "U")[1]
+def get_records_full_load(df):
+    df, records = records_to_tuple(df)
+    return df, records
+
+
+def records_to_tuple(df):
+    if df.shape[0] != 0:
+        df.rename(columns={"udated_at": "start_date"})
+        df = df.drop(columns=["status"])
+        df["end_date"] = "9999-12-31 23:59:59"
+        df["is_current"] = True
+        vectorized_element_to_string = np.vectorize(str)
+        records = ",".join(
+            vectorized_element_to_string(pd.Series(df.to_records(index=False).tolist()))
+        )
+        return df, records
+    else:
+        return df, ""
+
+
+def update_end_date_outdated_records(conn, update_values):
     query = f"""
     INSERT INTO user_dim (
         user_id, name, email, start_date, end_date, is_current
@@ -76,7 +88,7 @@ def update_end_date_outdated_records(conn, df):
             SELECT 
                 MAX(sk_user_id) 
             FROM 
-                user_dim 
+                user_dim
             WHERE 
                 user_id = EXCLUDED.user_id
     );
@@ -85,8 +97,7 @@ def update_end_date_outdated_records(conn, df):
     conn.commit()
 
 
-def insert_new_records(conn, df):
-    insert_values = get_records(df, "All")[1]
+def insert_new_records(conn, insert_values):
     query = f"""
     INSERT INTO user_dim (
         user_id, name, email, start_date, end_date, is_current
@@ -97,12 +108,12 @@ def insert_new_records(conn, df):
 
 
 def incremental_load(conn, df):
-    update_end_date_outdated_records(conn, df)
-    insert_new_records(conn, df)
+    update_end_date_outdated_records(conn, get_records_incremental_load(df, "U")[1])
+    insert_new_records(conn, get_records_incremental_load(df, "All")[1])
 
 
 def full_load(conn, df):
-    insert_new_records(conn, df)
+    update_end_date_outdated_records(conn, get_records_full_load(df)[1])
 
 
 if __name__ == "__main__":
