@@ -15,7 +15,8 @@ The project includes the following key components:
 - **Boto3 (ETL):** Boto3 is used to interact with AWS S3 for data upload and download during the ETL process.
 - **Git (Teamwork):** Git version control system is employed for collaborative development and code management.
 
-![Data Engineering Project Components](path/to/your/image.png)
+![image](https://github.com/hoanguyen071710/glorious-data-pipeline/assets/76463109/6da3f442-2dd4-4437-bb01-7f9ae40c5366)
+
 
 ## Situation
 In this project, we randomly generate data into the RDS database at specific intervals, mimicking a real stock platform database. We use Pandas, SQLAlchemy, and Cron to schedule and snapshot data daily, implementing both the Hard Delete Pattern and Soft Delete Pattern to minimize loads on the production database.
