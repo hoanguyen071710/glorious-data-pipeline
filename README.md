@@ -42,6 +42,7 @@ The project encompasses the following major tasks:
 - Set up cron jobs to schedule and automate data generation and ETL processes.
 - Utilize SQLAlchemy and Boto3 for efficient data upload and download between different components.
 - Handle datetime conversions, considering both UTC and Asia/Ho_Chi_Minh (HCM) timezones.
+- Create dashboard for visualization and BI tasks (in progress)
 
 ## Result
 Upon completing the data pipeline, we will have dimensions and fact data that can be joined together for analysis and reporting.
