@@ -15,7 +15,7 @@ The project includes the following key components:
 - **Boto3 (ETL):** Boto3 is used to interact with AWS S3 for data upload and download during the ETL process.
 - **Git (Teamwork):** Git version control system is employed for collaborative development and code management.
 
-![image](https://github.com/hoanguyen071710/glorious-data-pipeline/assets/76463109/6da3f442-2dd4-4437-bb01-7f9ae40c5366)
+![Flow and components](https://github.com/hoanguyen071710/glorious-data-pipeline/assets/76463109/94a63875-8e78-4653-9617-f91077aacafe)
 
 
 ## Situation
