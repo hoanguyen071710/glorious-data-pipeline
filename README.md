@@ -27,14 +27,14 @@ We then detect changes with these patterns (Delete and Soft) to load data into t
 
 For example, we query whether the customers would buy more stocks after their email address got changed.
 
-![Data Model Image](path/to/your/datamodelimage.png)
+![Data Model](https://github.com/hoanguyen071710/glorious-data-pipeline/assets/76463109/f0c68dd3-66ca-40d6-b9d2-22b317a1c8c8)
 
 ## Design
 In our data model design, we have the following considerations:
 - The user table is designed to enable the Soft Delete Pattern for handling data deletions.
 - The stock table does not have a change indicator column, so we must use the Hard Delete Pattern to handle updates.
 
-![Entity Relationship Diagram (ERD) Image](path/to/your/erdimage.png)
+![Data Warehouse Entity Relationship Diagram (ERD)](https://github.com/hoanguyen071710/glorious-data-pipeline/assets/76463109/951c1c1f-fc49-4a05-8171-5b16f8f57a2f)
 
 ## Tasks
 The project encompasses the following major tasks:
