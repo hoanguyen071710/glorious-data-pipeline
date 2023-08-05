@@ -1,6 +1,6 @@
 CREATE DATABASE stock_db;
 
-CREATE TABLE stock
+CREATE TABLE Stock
   (
      stock_id VARCHAR(5) NOT NULL PRIMARY KEY,
      company  VARCHAR(100) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE stock
      CONSTRAINT company UNIQUE (company)
   );
 
-CREATE TABLE user
+CREATE TABLE User
   (
      user_id    INT auto_increment PRIMARY KEY,
      name       VARCHAR(100) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE user
      status     VARCHAR(1) DEFAULT NULL
   );
 
-CREATE TABLE transaction
+CREATE TABLE Transaction
   (
      transaction_id   INT auto_increment PRIMARY KEY,
      user_id          INT NULL,
@@ -26,11 +26,11 @@ CREATE TABLE transaction
      quantity         INT NOT NULL,
      transaction_date TIMESTAMP,
      CONSTRAINT transaction_stock_stock_id_fk FOREIGN KEY (stock_id) REFERENCES
-     stock (stock_id),
+     Stock (stock_id),
      CONSTRAINT transaction_user_user_id_fk FOREIGN KEY (user_id) REFERENCES
-     user (user_id)
+     User (user_id)
   );
 
-CREATE INDEX stock_id ON transaction (stock_id);
+CREATE INDEX stock_id ON Transaction (stock_id);
 
-CREATE INDEX user_id ON transaction (user_id);
+CREATE INDEX user_id ON Transaction (user_id);
